@@ -1,9 +1,18 @@
 :root {
+    --primary-color: #263238;
     --primary-dark: #333;
-    --primary-light: #ededed;
-    --secondary-light: #fefefe;
+    --secondary-color: #37474F;
   }
 
+html{
+    background-color: var(--primary-color);
+}
+
+img{
+    width: 170px;
+    height: 170px;
+    display: none;
+}
 #board{
     display: flex;
     flex-wrap: wrap;
@@ -21,14 +30,13 @@
     border-style: solid;
     padding: 0;
     margin: 0;
+    background-color: var(--secondary-color);
 }
 
 .plate:hover{
     transform: scale(1.01);
-    background-color: var(--secondary-light);
 }
 
 .plate:active{
-    background-color: var(--secondary-light);
     transform: scale(0.95);
 }
