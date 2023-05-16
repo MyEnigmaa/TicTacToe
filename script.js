@@ -1,14 +1,15 @@
-//Variables & Objectes
 const board = document.getElementById("board");
-const newGameBtn = document.getElementById("newGame");
+const newGameBtn = document.getElementById("newGameBtn");
+const restartBtn = document.getElementById("restartBtn");
 const xSource = "./img/X_icon.svg";
 const oSource = "./img/O_icon.svg";
 var activePlayer=1;
+var gameActive = true;
 
 const gameboard = (() => {
     const boardArr = new Array(3).fill(0).map(()=>new Array (3).fill(0));
 
-    function createTile(number, row, column){
+    function tile(number, row, column){
         number = number;
         tileRow = row;
         tileColumn = column;
@@ -33,7 +34,7 @@ const gameboard = (() => {
                 divTile.id = number;
                 divTile.className = "plate";
                 board.appendChild(divTile);
-                divTile.addEventListener("click", (e)=>{player(e);})
+                divTile.addEventListener("click", (e)=>{game.tilePressed(e);})
             },
             setPlayer(player){
                 playerPicked = player;
@@ -50,7 +51,7 @@ const gameboard = (() => {
         let x=0;
         for(i=0;i<3;i++){
             for(j=0;j<3;j++){
-                boardArr[i][j] = createTile(x,i,j);
+                boardArr[i][j] = tile(x,i,j);
                 boardArr[i][j].createDomElement();
                 x++;
             }
@@ -73,6 +74,7 @@ const game = (()=>{
     const restartGame = ()=>{
         gameboard.clearBoard();
         timesPressed = 0;
+        gameActive =  true;
     }
     const checkForWin = (row, column, entrie)=>{//Checking for winning condition
 
@@ -170,32 +172,51 @@ const game = (()=>{
         }
         return;
     }
-
+    const tilePressed = (e)=>{
+        if(!gameActive) return;
+        if(e.target != e.currentTarget)return; //prevents childs from triggering
+        let row = Math.floor(e.target.id/3);
+        let column = e.target.id%3;
+        gameboard.boardArr[row][column].selectTile(activePlayer,e);
+        gameboard.boardArr[row][column].setPlayer(activePlayer);
+        game.checkForWin(row, column,activePlayer);
+        activePlayer == 1 ? activePlayer=2 : activePlayer=1;
+    }
     const winner = (player) => {
         if(player==0){
             console.log("draw");
         }
+
         console.log("player " + player + " won");
+
+        gameActive = false;
     }
 
-    return {checkForWin, restartGame};
+    return {checkForWin, restartGame,tilePressed};
 })();
 
-//Functions
-newGameBtn.addEventListener("click", ()=>{game.restartGame()}); //Clears the Board
+newGameBtn.addEventListener("click", ()=>{
+    board.style.display = "flex";
+    gameboard.createBoard();
+    newGameBtn.style.display = "none";
+    restartBtn.style.display = "block";
+}); //Clears the Board
 
-function player(e){
-    if(e.target != e.currentTarget)return; //prevents childs from triggering
-    let row = Math.floor(e.target.id/3);
-    let column = e.target.id%3;
-    gameboard.boardArr[row][column].selectTile(activePlayer,e);
-    gameboard.boardArr[row][column].setPlayer(activePlayer);
-    game.checkForWin(row, column,activePlayer);
-    activePlayer == 1 ? activePlayer=2 : activePlayer=1;
+restartBtn.addEventListener("click",()=>{
+    game.restartGame();
+})
+
+function player(name){
+    playerName = name;
+    playerActive = false;
+    return {
+        setPlayerActive(x){
+            playerActive = x;
+        },
+        getPlayerActive(){return playerActive}
+    };
 }
 
 window.onload = ()=>{
 
-    console.log("player 1 x, player 2 o")
-    gameboard.createBoard();
 }
